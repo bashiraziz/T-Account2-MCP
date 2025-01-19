@@ -1,0 +1,30 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --color-bg-light: #ffffff;
+  --color-text-light: #171717;
+  --color-primary: #00ac47;
+  --color-secondary: #ff7127;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --color-bg-dark: #0a0a0a;
+    --color-text-dark: #ededed;
+  }
+}
+
+body {
+  color: var(--color-text-light);
+  background: var(--color-bg-light);
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+@media (prefers-color-scheme: dark) {
+  body {
+    color: var(--color-text-dark);
+    background: var(--color-bg-dark);
+  }
+}
