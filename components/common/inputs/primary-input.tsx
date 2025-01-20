@@ -24,7 +24,7 @@ export const PrimaryInput: FC<PrimaryInputProps> = ({
 
   return (
     <div
-      className={`flex items-center bg-[#f3f2f7] rounded-lg px-4 py-2 ${className} ${
+      className={`flex items-center bg-[#f3f2f7] rounded-lg px-4 py-2.5 ${className} ${
         isFocused ? "outline outline-1 outline-secondary" : ""
       }`}
     >
