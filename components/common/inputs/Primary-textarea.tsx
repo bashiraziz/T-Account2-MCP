@@ -1,43 +1,37 @@
 "use client";
-import { FC, ReactNode, useState } from "react";
+import { FC, useState } from "react";
 
-interface PrimaryInputProps {
-  type?: string;
+interface PrimaryTextareaProps {
   placeholder?: string;
-  onChange?: (event: React.ChangeEvent<HTMLInputElement>) => void;
+  onChange?: (event: React.ChangeEvent<HTMLTextAreaElement>) => void;
   name?: string;
   value?: string | number;
   className?: string;
-  prefixIcon?: ReactNode;
   inputClassName?: string;
 }
 
-export const PrimaryInput: FC<PrimaryInputProps> = ({
-  type = "text",
+export const PrimaryTextarea: FC<PrimaryTextareaProps> = ({
   placeholder,
   onChange,
   name,
   value,
   className,
-  prefixIcon,
   inputClassName,
 }) => {
   const [isFocused, setIsFocused] = useState(false);
 
   return (
     <div
-      className={`flex items-center bg-[#f3f2f7] rounded-lg px-4 py-2.5 ${className} ${
+      className={`flex items-center bg-[#f3f2f7] rounded-lg px-4 py-3 ${className} ${
         isFocused ? "outline outline-1 outline-secondary" : ""
       }`}
     >
-      {prefixIcon && <span className="mr-3">{prefixIcon}</span>}
-      <input
-        type={type}
+      <textarea
         placeholder={placeholder}
         onChange={onChange}
         name={name}
         value={value}
-        className={`w-full outline-none bg-transparent text-sm placeholder:text-sm ${inputClassName}`}
+        className={`w-full h-[100px] outline-none bg-transparent text-sm resize-none placeholder:text-sm ${inputClassName}`}
         onFocus={() => setIsFocused(true)}
         onBlur={() => setIsFocused(false)}
       />

@@ -17,14 +17,14 @@ export const SecondaryBtn: FC<SecondaryBtnProps> = ({
 }) => {
   return (
     <button
-      className={`flex items-center border border-secondary text-secondary text-base font-medium rounded px-4 py-1.5 transition-all duration-300 ease-in-out ${className}`}
+      className={`flex items-center border text-base font-medium rounded px-4 py-2 transition-all duration-300 ease-in-out ${className}`}
       onClick={onClick}
       disabled={isLoading}
     >
       {isLoading ? (
         "Loading..."
       ) : (
-        <span className="flex items-center gap-3">
+        <span className="flex items-center gap-2">
           {icon} {text}
         </span>
       )}

@@ -11,7 +11,7 @@ import {
   FaChevronLeft,
   FaSignOutAlt,
 } from "react-icons/fa";
-import { PrimaryBtn, SecondaryBtn } from "../common";
+import { SecondaryBtn } from "../common";
 
 interface LinkItem {
   href: string;
@@ -46,13 +46,17 @@ export const Sidebar: FC = () => {
   };
 
   return (
-    <div className="relative">
+    <div
+      className={`transition-all duration-500 ease-in-out ${
+        isCollapsed ? "w-[74px] px-4" : "w-[260px] px-6"
+      }`}
+    >
       <div
-        className={`h-screen flex flex-col bg-[#f6f6fb] py-6 transition-all duration-500 ease-in-out overflow-hidden ${
+        className={`fixed top-0 left-0 z-30 h-screen flex flex-col bg-[#f6f6fb] py-6 transition-all duration-500 ease-in-out ${
           isCollapsed ? "w-[74px] px-4" : "w-[260px] px-6"
         }`}
       >
-        <div className="flex items-center">
+        <div className="flex items-center overflow-hidden">
           <Image
             src="/images/t-account-logo.png"
             width={40}
@@ -75,10 +79,10 @@ export const Sidebar: FC = () => {
               <Link
                 key={link.href}
                 href={link.href}
-                className={`h-10 text-base flex flex-nowrap whitespace-nowrap items-center gap-3 py-2 rounded ${
+                className={`h-10 text-base flex flex-nowrap whitespace-nowrap items-center gap-3 py-2 rounded-md ${
                   pathname === link.href
                     ? "bg-primary text-white px-2.5"
-                    : "px-3 hover:bg-[#00ac4738]"
+                    : "px-3 hover:bg-primaryLight"
                 }`}
               >
                 <span className="w-5 h-5">{link.icon}</span>
@@ -95,8 +99,8 @@ export const Sidebar: FC = () => {
           </div>
           <div className="border-t pt-4">
             <SecondaryBtn
-              className="w-fit h-10 !px-3 !border-0"
-              icon={<FaSignOutAlt className="w-5 h-5" />}
+              className="w-fit h-10 !px-3 !border-0 text-secondary"
+              icon={<FaSignOutAlt className="w-5 h-5 mr-1" />}
               text={isCollapsed ? "" : "Logout"}
             />
           </div>

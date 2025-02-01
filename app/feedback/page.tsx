@@ -1,7 +1,12 @@
+import { FeedbackForm } from "@/components";
 import { FC } from "react";
 
 const Feedback: FC = () => {
-  return <div className="py-6">Feedback</div>;
+  return (
+    <div>
+      <FeedbackForm />
+    </div>
+  );
 };
 
 export default Feedback;
