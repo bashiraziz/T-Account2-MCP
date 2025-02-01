@@ -35,7 +35,13 @@ export const TransactionSection: FC<TransactionSectionProps> = ({
   balance,
 }) => {
   const isDebit = type === "debit";
-  const balanceClass = isDebit ? "text-green-500" : "text-red-500";
+
+  const formatNumber = (num: number | string) => {
+    if (!num) return "0.00";
+    return new Intl.NumberFormat("en-US", { minimumFractionDigits: 2 }).format(
+      Number(num)
+    );
+  };
 
   return (
     <div
@@ -94,10 +100,10 @@ export const TransactionSection: FC<TransactionSectionProps> = ({
       </div>
       <div className="mt-8 mx-2 border-b pb-1">
         <div className="flex justify-between items-center font-medium text-gray-500 py-2">
-          Balance: <span>{balance.toFixed(2)}</span>
+          Balance: <span>{formatNumber(balance)}</span>
         </div>
         <div className="flex justify-between items-center font-medium text-gray-500 py-2 border-y">
-          Total: <span className="text-black">{total.toFixed(2)}</span>
+          Total: <span className="text-black">{formatNumber(total)}</span>
         </div>
       </div>
     </div>
