@@ -36,7 +36,9 @@ export const DeleteCoa = () => {
 
   return (
     <div>
-      <h4 className="text-primary text-lg font-medium mb-4">Delete Chart of Account</h4>
+      <h4 className="text-primary text-lg font-medium mb-4">
+        Delete an Account
+      </h4>
       <div className="max-w-[680px] w-full flex flex-wrap gap-3">
         <SelectAccount
           label="Select account"

@@ -41,7 +41,7 @@ export const DeleteAll = () => {
     <div>
       <div className="max-w-[680px] w-full flex items-center flex-wrap gap-3">
         <h4 className="text-primary text-lg font-medium">
-          Delete all Chart of Accounts
+          Delete Chart of Accounts
         </h4>
         <PrimaryBtn
           onClick={handleShowWarning}

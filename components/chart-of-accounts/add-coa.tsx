@@ -74,9 +74,7 @@ export const AddCoa = () => {
 
   return (
     <div>
-      <h4 className="text-primary text-lg font-medium mb-4">
-        Add Chart of Account
-      </h4>
+      <h4 className="text-primary text-lg font-medium mb-4">Add an Account</h4>
       <div className="max-w-[680px] w-full flex flex-wrap gap-3">
         <OutlinedInput
           containerClassName="w-full"
