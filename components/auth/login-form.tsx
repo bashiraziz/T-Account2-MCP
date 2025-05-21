@@ -2,7 +2,14 @@
 import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { PrimaryBtn, PrimaryInput } from "../common";
+import {
+  ErrorAlert,
+  LoadingSpinner,
+  PrimaryBtn,
+  PrimaryInput,
+} from "../common";
+import { useLogin } from "@/hooks";
+import { FaInfoCircle } from "react-icons/fa";
 
 export const LoginForm = () => {
   const [formData, setFormData] = useState({
@@ -14,7 +21,10 @@ export const LoginForm = () => {
     emailOrUsername: "",
     password: "",
   });
+  const [invalidCredentials, setInvalidCredentials] = useState("");
   const router = useRouter();
+
+  const { mutate: login, isPending } = useLogin();
 
   const handleOnChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
@@ -23,7 +33,7 @@ export const LoginForm = () => {
     setErrors({ ...errors, [e.target.name]: "" });
   };
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     let newErrors = { emailOrUsername: "", password: "" };
 
@@ -35,16 +45,25 @@ export const LoginForm = () => {
 
     if (Object.values(newErrors).some((error) => error !== "")) return;
 
-    router.push("/");
+    login(
+      { identifier: formData.emailOrUsername, password: formData.password },
+      {
+        onSuccess: () => router.push("/"),
+        onError: (err) => setInvalidCredentials(err.message),
+      }
+    );
   };
 
   return (
-    <div className="w-[460px] py-10 px-8 bg-white rounded-xl shadow-[0_3px_10px_rgb(0,0,0,0.2)]">
+    <div className="max-w-[460px] w-full py-7 md:py-10 px-5 md:px-8 bg-white rounded-xl shadow-[0_3px_10px_rgb(0,0,0,0.2)]">
       <div className="">
-        <h2 className="text-3xl font-medium text-center mb-4">
+        <h2 className="text-2xl md:text-3xl font-medium text-center mb-4">
           Login to your account.
         </h2>
       </div>
+      {invalidCredentials && (
+        <ErrorAlert error={invalidCredentials} className="mt-6" />
+      )}
       <form onSubmit={handleSubmit} className="flex flex-col gap-4 pt-6">
         <div>
           <label className="inline-block text-base text-black mb-1">
@@ -71,6 +90,7 @@ export const LoginForm = () => {
           </label>
           <PrimaryInput
             name="password"
+            type="password"
             value={formData.password}
             onChange={handleOnChange}
             placeholder="Enter your password"
@@ -89,13 +109,18 @@ export const LoginForm = () => {
           </Link>
         </div>
         <PrimaryBtn
-          text="Login"
+          text={!isPending ? "Login" : ""}
+          icon={
+            isPending ? (
+              <LoadingSpinner borderColor="border-white" className="mx-auto" />
+            ) : undefined
+          }
           type="submit"
           className="bg-secondary py-3 mt-2"
         />
       </form>
       <div className="pt-5">
-        <p className="text-gray-400 text-xs font-normal mb-5">
+        <p className="text-gray-400 text-xs font-normal mb-5 max-sm:text-center">
           By logging in, you agree to the{" "}
           <Link href="/" className="text-secondary underline">
             Terms

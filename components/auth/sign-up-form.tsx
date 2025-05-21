@@ -1,9 +1,22 @@
 "use client";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
-import { PrimaryBtn, PrimaryInput, VerificationCodeInput } from "../common";
+import {
+  LoadingSpinner,
+  PrimaryBtn,
+  PrimaryInput,
+  VerificationCodeInput,
+} from "../common";
 import { useRouter } from "next/navigation";
 import { LuLoaderCircle, LuMailOpen } from "react-icons/lu";
+import { handleOnChange, validateSignupForm } from "@/utils";
+import {
+  useSendVerificationCode,
+  useSignup,
+  useVerifyCode,
+  useCheckUsername,
+} from "@/hooks";
+import { signIn } from "next-auth/react";
 
 export const SignUpForm = () => {
   const [formData, setFormData] = useState({
@@ -11,7 +24,7 @@ export const SignUpForm = () => {
     lastName: "",
     username: "",
     email: "",
-    phone: "",
+    phoneNumber: "",
     password: "",
     confirmPassword: "",
   });
@@ -24,65 +37,113 @@ export const SignUpForm = () => {
     password: "",
     confirmPassword: "",
   });
+
+  const [usernameAvailable, setUsernameAvailable] = useState("");
+
   const [showVerifyEmail, setShowVerifyEmail] = useState(false);
-  const [verificationLoader, setVerificationLoader] = useState(false);
   const router = useRouter();
 
-  const validateEmail = (email: string) => {
-    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
-  };
+  const { mutate: checkUsername, isPending: isCheckingUsername } =
+    useCheckUsername();
 
-  const handleOnChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
-  ) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
-    setErrors({ ...errors, [e.target.name]: "" });
-  };
+  // Debounce username check
+  useEffect(() => {
+    if (!formData.username.trim()) {
+      setUsernameAvailable("");
+      setErrors((prev) => ({ ...prev, username: "" }));
+      return;
+    }
+
+    const delayDebounce = setTimeout(() => {
+      checkUsername(formData.username, {
+        onSuccess: (data) => {
+          if (data.available) {
+            setUsernameAvailable("Username is available");
+            setErrors((prev) => ({ ...prev, username: "" }));
+          } else {
+            setUsernameAvailable("");
+            setErrors((prev) => ({
+              ...prev,
+              username: "Username is already taken",
+            }));
+          }
+        },
+      });
+    }, 500);
+
+    return () => clearTimeout(delayDebounce);
+  }, [formData.username, checkUsername]);
+
+  const { mutate: sendVerificationCode, isPending: isSendingCode } =
+    useSendVerificationCode();
+  const { mutate: verifyCode, isPending: isVerifyingCode } = useVerifyCode();
+  const { mutate: signup, isPending: isSigningUp } = useSignup();
+
+  const onChange = handleOnChange(setFormData, setErrors);
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    let newErrors = {
-      firstName: "",
-      lastName: "",
-      username: "",
-      email: "",
-      password: "",
-      confirmPassword: "",
-    };
-
-    if (!formData.firstName.trim())
-      newErrors.firstName = "First name is required.";
-    if (!formData.lastName.trim())
-      newErrors.lastName = "Last name is required.";
-    if (!formData.username.trim()) newErrors.username = "Username is required.";
-    if (!formData.email.trim()) newErrors.email = "Email is required.";
-    else if (!validateEmail(formData.email))
-      newErrors.email = "Invalid email format.";
-    if (!formData.password.trim()) newErrors.password = "Password is required.";
-    if (!formData.confirmPassword.trim())
-      newErrors.confirmPassword = "Confirm password is required.";
-    else if (formData.confirmPassword !== formData.password)
-      newErrors.confirmPassword = "Password does not match";
-
+    const newErrors = validateSignupForm(formData);
     setErrors(newErrors);
 
     if (Object.values(newErrors).some((error) => error !== "")) return;
+    if (!usernameAvailable) {
+      setErrors((prev) => ({
+        ...prev,
+        username: "Username is already taken",
+      }));
+      return;
+    }
 
-    setShowVerifyEmail(true);
+    sendVerificationCode(formData.email, {
+      onSuccess: () => {
+        setShowVerifyEmail(true);
+      },
+      onError: (error) => {
+        console.error("Error sending verification code:", error);
+      },
+    });
   };
 
   const handleVerifyEmail = (code: string) => {
-    setVerificationLoader(true);
-    console.log(code);
-    // setTimeout is temporary (will remove it later)
-    setTimeout(() => {
-      router.push("/");
-    }, 1000);
+    verifyCode(
+      { email: formData.email, code },
+      {
+        onSuccess: () => {
+          // Step 3: Proceed with Signup
+          const { confirmPassword, ...signupData } = formData;
+          signup(signupData, {
+            onSuccess: async () => {
+              console.log("✅ Signup successful! Auto-logging in...");
+
+              const result = await signIn("credentials", {
+                redirect: false,
+                identifier: formData.email,
+                password: formData.password,
+              });
+
+              if (result?.error) {
+                console.error("❌ Auto-login failed:", result.error);
+              } else {
+                console.log("🎉 Auto-login successful! Redirecting...");
+                router.push("/");
+              }
+            },
+            onError: (error) => {
+              console.error("Signup Error:", error);
+            },
+          });
+        },
+        onError: (error) => {
+          console.error("Verification Error:", error);
+        },
+      }
+    );
   };
 
   return (
-    <div className="w-[460px] py-10 px-8 bg-white rounded-xl shadow-[0_3px_10px_rgb(0,0,0,0.2)]">
-      <div className="flex flex-col gap-2 text-3xl font-medium text-center mb-4">
+    <div className="max-w-[460px] w-full py-7 md:py-10 px-5 md:px-8 bg-white rounded-xl shadow-[0_3px_10px_rgb(0,0,0,0.2)]">
+      <div className="flex flex-col gap-2 text-2xl md:text-3xl font-medium text-center mb-4">
         {showVerifyEmail ? (
           <>
             <LuMailOpen className="w-12 h-12 mx-auto mb-2" />
@@ -98,28 +159,28 @@ export const SignUpForm = () => {
       </div>
       {showVerifyEmail ? (
         <div className="flex flex-col gap-4 py-4 relative">
-          {verificationLoader && (
+          {(isVerifyingCode || isSigningUp) && (
             <LuLoaderCircle className="absolute bottom-2 left-0 right-0 z-10 mx-auto w-16 h-16 text-gray-500 animate-spin" />
           )}
           <label className="flex justify-center text-base text-black mb-2">
             Enter your verification code
           </label>
           <VerificationCodeInput
-            loading={verificationLoader}
+            loading={isVerifyingCode || isSigningUp}
             onComplete={handleVerifyEmail}
           />
         </div>
       ) : (
         <form onSubmit={handleSubmit} className="flex flex-col gap-4 pt-6">
-          <div className="flex items-start gap-4">
-            <div>
+          <div className="flex items-start gap-4 max-sm:flex-col">
+            <div className="w-full">
               <label className="inline-block text-base text-black mb-1">
                 First name <span className="text-red-500">*</span>
               </label>
               <PrimaryInput
                 name="firstName"
                 value={formData.firstName}
-                onChange={handleOnChange}
+                onChange={onChange}
                 placeholder="Enter your first name"
                 className={`!py-3 ${
                   errors.firstName ? "outline outline-1 outline-red-500" : ""
@@ -129,14 +190,14 @@ export const SignUpForm = () => {
                 <p className="text-red-500 text-sm mt-1">{errors.firstName}</p>
               )}
             </div>
-            <div>
+            <div className="w-full">
               <label className="inline-block text-base text-black mb-1">
                 Last name <span className="text-red-500">*</span>
               </label>
               <PrimaryInput
                 name="lastName"
                 value={formData.lastName}
-                onChange={handleOnChange}
+                onChange={onChange}
                 placeholder="Enter your last name"
                 className={`!py-3 ${
                   errors.lastName ? "outline outline-1 outline-red-500" : ""
@@ -151,17 +212,30 @@ export const SignUpForm = () => {
             <label className="inline-block text-base text-black mb-1">
               Username <span className="text-red-500">*</span>
             </label>
-            <PrimaryInput
-              name="username"
-              value={formData.username}
-              onChange={handleOnChange}
-              placeholder="Enter a username"
-              className={`!py-3 ${
-                errors.username ? "outline outline-1 outline-red-500" : ""
-              }`}
-            />
+            <div className="relative">
+              <PrimaryInput
+                name="username"
+                value={formData.username}
+                onChange={onChange}
+                placeholder="Enter a username"
+                className={`!py-3 ${
+                  errors.username ? "outline outline-1 outline-red-500" : ""
+                } ${
+                  usernameAvailable ? "outline outline-1 outline-primary" : ""
+                }`}
+              />
+              {isCheckingUsername && (
+                <LoadingSpinner
+                  borderColor="border-gray-600"
+                  className="!w-5 !h-5 absolute right-4 top-0 bottom-0 my-auto"
+                />
+              )}
+            </div>
             {errors.username && (
               <p className="text-red-500 text-sm mt-1">{errors.username}</p>
+            )}
+            {usernameAvailable && (
+              <p className="text-primary text-sm mt-1">{usernameAvailable}</p>
             )}
           </div>
           <div>
@@ -171,7 +245,7 @@ export const SignUpForm = () => {
             <PrimaryInput
               name="email"
               value={formData.email}
-              onChange={handleOnChange}
+              onChange={onChange}
               placeholder="Enter your email"
               className={`!py-3 ${
                 errors.email ? "outline outline-1 outline-red-500" : ""
@@ -186,9 +260,9 @@ export const SignUpForm = () => {
               Phone number
             </label>
             <PrimaryInput
-              name="phone"
-              value={formData.phone}
-              onChange={handleOnChange}
+              name="phoneNumber"
+              value={formData.phoneNumber}
+              onChange={onChange}
               placeholder="Enter your phone number"
               className={`!py-3`}
             />
@@ -199,8 +273,9 @@ export const SignUpForm = () => {
             </label>
             <PrimaryInput
               name="password"
+              type="password"
               value={formData.password}
-              onChange={handleOnChange}
+              onChange={onChange}
               placeholder="Enter your new password"
               className={`!py-3 ${
                 errors.password ? "outline outline-1 outline-red-500" : ""
@@ -216,8 +291,9 @@ export const SignUpForm = () => {
             </label>
             <PrimaryInput
               name="confirmPassword"
+              type="password"
               value={formData.confirmPassword}
-              onChange={handleOnChange}
+              onChange={onChange}
               placeholder="Confirm your new password"
               className={`!py-3 ${
                 errors.confirmPassword
@@ -232,7 +308,15 @@ export const SignUpForm = () => {
             )}
           </div>
           <PrimaryBtn
-            text="Sign up"
+            text={!isSendingCode ? "Sign up" : ""}
+            icon={
+              isSendingCode ? (
+                <LoadingSpinner
+                  borderColor="border-white"
+                  className="mx-auto"
+                />
+              ) : undefined
+            }
             type="submit"
             className="bg-secondary py-3 mt-2"
           />
@@ -240,7 +324,7 @@ export const SignUpForm = () => {
       )}
       <div className="pt-5">
         <p
-          className={`text-gray-400 text-xs font-normal mb-5 ${
+          className={`text-gray-400 text-xs font-normal mb-5 max-sm:text-center ${
             showVerifyEmail ? "text-center" : ""
           }`}
         >

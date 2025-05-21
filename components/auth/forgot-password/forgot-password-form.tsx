@@ -2,7 +2,13 @@
 import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { PrimaryBtn, PrimaryInput, VerificationCodeInput } from "@/components";
+import {
+  ErrorAlert,
+  LoadingSpinner,
+  PrimaryBtn,
+  PrimaryInput,
+  VerificationCodeInput,
+} from "@/components";
 import { FiArrowLeft } from "react-icons/fi";
 import {
   LuCircleCheckBig,
@@ -11,6 +17,11 @@ import {
   LuMailOpen,
   LuRectangleEllipsis,
 } from "react-icons/lu";
+import {
+  useResetPassword,
+  useSendForgotPasswordCode,
+  useVerifyForgotPasswordCode,
+} from "@/hooks";
 
 export const ForgotPasswordForm = () => {
   const [formData, setFormData] = useState({
@@ -26,8 +37,23 @@ export const ForgotPasswordForm = () => {
     confirmPassword: "",
   });
   const [verificationStep, setVerificationStep] = useState(1);
-  const [verificationLoader, setVerificationLoader] = useState(false);
   const router = useRouter();
+
+  const {
+    mutate: sendCodeMutation,
+    isPending: sendingCode,
+    error: sendCodeError,
+  } = useSendForgotPasswordCode();
+  const {
+    mutate: verifyCodeMutation,
+    isPending: verifyingCode,
+    error: verifyCodeError,
+  } = useVerifyForgotPasswordCode();
+  const {
+    mutate: resetPasswordMutation,
+    isPending: resettingPassword,
+    error: resetPasswordError,
+  } = useResetPassword();
 
   const validateEmail = (email: string) => {
     return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
@@ -41,73 +67,65 @@ export const ForgotPasswordForm = () => {
   };
 
   const handleSendVerificationCode = () => {
-    let newErrors = {
-      email: "",
-      verificationCode: "",
-      newPassword: "",
-      confirmPassword: "",
-    };
-
+    let newErrors = { ...errors, email: "" };
     if (!formData.email.trim())
       newErrors.email = "Your email is required to verify it's you.";
     else if (!validateEmail(formData.email))
       newErrors.email = "Invalid email format.";
 
     setErrors(newErrors);
-
     if (Object.values(newErrors).some((error) => error !== "")) return;
 
-    setVerificationStep(2);
+    sendCodeMutation(formData.email, {
+      onSuccess: () => setVerificationStep(2),
+      onError: (error) => setErrors({ ...errors, email: error.message }),
+    });
   };
 
   const handleVerifyCode = (code: string) => {
-    // let newErrors = {
-    //   email: "",
-    //   verificationCode: "",
-    //   newPassword: "",
-    //   confirmPassword: "",
-    // };
-
-    // if (!formData.verificationCode.trim())
-    //   newErrors.verificationCode = "Verification code is required.";
-
-    // setErrors(newErrors);
-
-    // if (Object.values(newErrors).some((error) => error !== "")) return;
-    setVerificationLoader(true);
-    console.log(code);
-    // setTimeout is temporary (will remove it later)
-    setTimeout(() => {
-      setVerificationStep(3);
-    }, 1000);
+    setFormData({ ...formData, verificationCode: code });
+    verifyCodeMutation(
+      { email: formData.email, code },
+      {
+        onSuccess: () => setVerificationStep(3),
+        onError: (error) =>
+          setErrors({ ...errors, verificationCode: error.message }),
+      }
+    );
   };
 
   const handleChangePassword = () => {
-    let newErrors = {
-      email: "",
-      verificationCode: "",
-      newPassword: "",
-      confirmPassword: "",
-    };
-
+    let newErrors = { ...errors, newPassword: "", confirmPassword: "" };
     if (!formData.newPassword.trim())
-      newErrors.newPassword = "Password is required";
+      newErrors.newPassword = "Password is required.";
     if (!formData.confirmPassword.trim())
       newErrors.confirmPassword = "Confirm password is required.";
-    else if (formData.confirmPassword !== formData.newPassword)
-      newErrors.confirmPassword = "Password does not match";
+    if (formData.newPassword !== formData.confirmPassword)
+      newErrors.confirmPassword = "Passwords do not match.";
 
     setErrors(newErrors);
-
     if (Object.values(newErrors).some((error) => error !== "")) return;
 
-    setVerificationStep(4);
+    resetPasswordMutation(
+      {
+        email: formData.email,
+        code: formData.verificationCode,
+        newPassword: formData.newPassword,
+      },
+      {
+        onSuccess: () => setVerificationStep(4),
+        onError: (error) =>
+          setErrors({ ...errors, newPassword: error.message }),
+      }
+    );
   };
 
+  const isError = sendCodeError || verifyCodeError || verifyCodeError;
+
   return (
-    <div className="w-[460px] py-10 px-8 bg-white rounded-xl shadow-[0_3px_10px_rgb(0,0,0,0.2)]">
+    <div className="max-w-[460px] w-full py-7 md:py-10 px-5 md:px-8 bg-white rounded-xl shadow-[0_3px_10px_rgb(0,0,0,0.2)]">
       <div
-        className={`flex flex-col gap-2 text-3xl font-medium text-center ${
+        className={`flex flex-col gap-2 text-2xl md:text-3xl font-medium text-center ${
           verificationStep === 4 ? "text-primary" : "mb-4"
         }`}
       >
@@ -144,6 +162,7 @@ export const ForgotPasswordForm = () => {
           ""
         )}
       </div>
+      {isError && <ErrorAlert error={isError?.message} className="mt-6" />}
       <form className="flex flex-col gap-4 pt-6">
         {verificationStep === 1 && (
           <>
@@ -167,7 +186,15 @@ export const ForgotPasswordForm = () => {
 
             <PrimaryBtn
               onClick={handleSendVerificationCode}
-              text="Send verification code"
+              text={!sendingCode ? "Send verification code" : ""}
+              icon={
+                sendingCode ? (
+                  <LoadingSpinner
+                    borderColor="border-white"
+                    className="mx-auto"
+                  />
+                ) : undefined
+              }
               type="button"
               className="bg-secondary py-3 mt-2"
             />
@@ -176,40 +203,22 @@ export const ForgotPasswordForm = () => {
         {verificationStep === 2 && (
           <>
             <div className="relative">
-              {verificationLoader && (
+              {verifyingCode && (
                 <LuLoaderCircle className="absolute -bottom-1.5 left-0 right-0 z-10 mx-auto w-16 h-16 text-gray-500 animate-spin" />
               )}
               <label className="flex justify-center text-base text-black mb-2">
                 Enter your verification code
               </label>
               <VerificationCodeInput
-                loading={verificationLoader}
+                loading={verifyingCode}
                 onComplete={handleVerifyCode}
               />
-              {/* <PrimaryInput
-                name="verificationCode"
-                value={formData.verificationCode}
-                onChange={handleOnChange}
-                placeholder="Enter verification code"
-                className={`!py-3 ${
-                  errors.verificationCode
-                    ? "outline outline-1 outline-red-500"
-                    : ""
-                }`}
-              /> */}
-              {errors.verificationCode && (
+              {/* {errors.verificationCode && (
                 <p className="text-red-500 text-sm mt-1">
                   {errors.verificationCode}
                 </p>
-              )}
+              )} */}
             </div>
-
-            {/* <PrimaryBtn
-              onClick={handleVerifyCode}
-              text="Submit"
-              type="button"
-              className="bg-secondary py-3 mt-2"
-            /> */}
           </>
         )}
         {verificationStep === 3 && (
@@ -220,6 +229,7 @@ export const ForgotPasswordForm = () => {
               </label>
               <PrimaryInput
                 name="newPassword"
+                type="password"
                 value={formData.newPassword}
                 onChange={handleOnChange}
                 placeholder="Enter your new password"
@@ -239,6 +249,7 @@ export const ForgotPasswordForm = () => {
               </label>
               <PrimaryInput
                 name="confirmPassword"
+                type="password"
                 value={formData.confirmPassword}
                 onChange={handleOnChange}
                 placeholder="Confirm your new password"
@@ -257,7 +268,15 @@ export const ForgotPasswordForm = () => {
 
             <PrimaryBtn
               onClick={handleChangePassword}
-              text="Submit"
+              text={!resettingPassword ? "Submit" : ""}
+              icon={
+                resettingPassword ? (
+                  <LoadingSpinner
+                    borderColor="border-white"
+                    className="mx-auto"
+                  />
+                ) : undefined
+              }
               type="button"
               className="bg-secondary py-3 mt-2"
             />

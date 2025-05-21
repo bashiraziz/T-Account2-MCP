@@ -1,0 +1,99 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("POSTGRES_PRISMA_URL")
+  directUrl = env("POSTGRES_URL_NON_POOLING")
+}
+
+enum EntryType {
+  DEBIT
+  CREDIT
+}
+
+model User {
+  id              String           @id @default(uuid())
+  firstName       String
+  lastName        String
+  username        String           @unique
+  email           String           @unique
+  phoneNumber     String?
+  password        String
+  profileImage    String?
+  sessions        Session[]
+  chartOfAccounts ChartOfAccount[]
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
+}
+
+model VerificationCode {
+  id        String   @id @default(uuid())
+  email     String   @unique
+  code      String?
+  verified  Boolean  @default(false)
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+}
+
+model ChartOfAccount {
+  id             String   @id @default(uuid())
+  user           User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId         String
+  accountCode    String
+  accountName    String
+  classification String
+  type           String
+  detailType     String?
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  @@unique([userId, accountCode])
+}
+
+model Session {
+  id              String     @id @default(uuid())
+  user            User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId          String
+  date            DateTime
+  referenceNumber String
+  description     String?
+  tAccounts       TAccount[]
+  createdAt       DateTime   @default(now())
+  updatedAt       DateTime   @updatedAt
+}
+
+model TAccount {
+  id            String   @id @default(uuid())
+  session       Session  @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  sessionId     String
+  accountNumber String
+  accountName   String
+  entries       Entry[]
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  @@unique([sessionId, accountNumber])
+}
+
+model Entry {
+  id              String    @id @default(uuid())
+  tAccount        TAccount  @relation(fields: [tAccountId], references: [id], onDelete: Cascade)
+  tAccountId      String
+  referenceNumber String
+  description     String?
+  amount          Float
+  entryType       EntryType
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+}

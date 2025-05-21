@@ -14,6 +14,7 @@ export default {
         primary: "var(--color-primary)",
         primaryLight: "var(--color-primary-light)",
         secondary: "var(--color-secondary)",
+        secondaryLight: "var(--color-secondary-light)",
       },
     },
   },

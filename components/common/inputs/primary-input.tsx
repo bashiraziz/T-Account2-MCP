@@ -1,5 +1,6 @@
 "use client";
 import { FC, ReactNode, useState } from "react";
+import { LuEye, LuEyeOff } from "react-icons/lu";
 
 interface PrimaryInputProps {
   type?: string;
@@ -23,6 +24,11 @@ export const PrimaryInput: FC<PrimaryInputProps> = ({
   inputClassName,
 }) => {
   const [isFocused, setIsFocused] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+
+  const togglePasswordVisibility = () => {
+    setShowPassword(!showPassword);
+  };
 
   return (
     <div
@@ -32,7 +38,7 @@ export const PrimaryInput: FC<PrimaryInputProps> = ({
     >
       {prefixIcon && <span className="mr-3">{prefixIcon}</span>}
       <input
-        type={type}
+        type={type === "password" && showPassword ? "text" : type}
         placeholder={placeholder}
         onChange={onChange}
         name={name}
@@ -41,6 +47,15 @@ export const PrimaryInput: FC<PrimaryInputProps> = ({
         onFocus={() => setIsFocused(true)}
         onBlur={() => setIsFocused(false)}
       />
+      {type === "password" && (
+        <button
+          type="button"
+          onClick={togglePasswordVisibility}
+          className="text-lg text-gray-900 cursor-pointer"
+        >
+          {showPassword ? <LuEye /> : <LuEyeOff />}
+        </button>
+      )}
     </div>
   );
 };

@@ -1,6 +1,15 @@
 "use client";
 import { FC, useState } from "react";
-import { PrimaryBtn, PrimaryInput, PrimaryTextarea } from "../common";
+import {
+  LoadingSpinner,
+  PrimaryBtn,
+  PrimaryInput,
+  PrimaryTextarea,
+  showErrorToast,
+  showSuccessToast,
+  ToastNotification,
+} from "../common";
+import { useSendFeedback } from "@/hooks";
 
 export const FeedbackForm: FC = () => {
   const [formData, setFormData] = useState({
@@ -17,6 +26,9 @@ export const FeedbackForm: FC = () => {
     email: "",
     message: "",
   });
+
+  const { mutate: sendFeedback, isPending: isSendingFeedback } =
+    useSendFeedback();
 
   const validateEmail = (email: string) => {
     return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
@@ -46,13 +58,27 @@ export const FeedbackForm: FC = () => {
 
     if (Object.values(newErrors).some((error) => error !== "")) return;
 
-    // We will use API later here
-    console.log("Form submitted", formData);
+    sendFeedback(formData, {
+      onSuccess: () => {
+        setFormData({
+          firstName: "",
+          lastName: "",
+          email: "",
+          subject: "",
+          message: "",
+        });
+        showSuccessToast("Feedback submitted successfully!");
+      },
+      onError: () => {
+        showErrorToast("Failed to send feedback. Please try again.");
+      },
+    });
   };
 
   return (
     <div className="py-10">
-      <div className="max-w-[500px] mx-auto px-8 py-8 rounded-xl border">
+      <ToastNotification />
+      <div className="max-w-[500px] mx-auto sm:p-8 sm:rounded-xl sm:border">
         <div className="mb-8 border-b pb-6">
           <h1 className="text-4xl font-medium text-center mb-2">Feedback</h1>
           <p className="text-sm mt-1 font-normal text-center">
@@ -61,7 +87,7 @@ export const FeedbackForm: FC = () => {
           </p>
         </div>
         <form onSubmit={handleOnSubmit} className="flex flex-wrap gap-4">
-          <div className="w-[48%]">
+          <div className="w-full sm:w-[48%]">
             <label className="inline-block text-base text-black mb-1">
               First name <span className="text-red-500">*</span>
             </label>
@@ -78,7 +104,7 @@ export const FeedbackForm: FC = () => {
               <p className="text-red-500 text-sm mt-1">{errors.firstName}</p>
             )}
           </div>
-          <div className="w-[48%]">
+          <div className="w-full sm:w-[48%]">
             <label className="inline-block text-base text-black mb-1">
               Last name <span className="text-red-500">*</span>
             </label>
@@ -141,7 +167,15 @@ export const FeedbackForm: FC = () => {
             )}
           </div>
           <PrimaryBtn
-            text="Send Message"
+            text={!isSendingFeedback ? "Send" : ""}
+            icon={
+              isSendingFeedback ? (
+                <LoadingSpinner
+                  borderColor="border-white"
+                  className="mx-auto"
+                />
+              ) : undefined
+            }
             type="submit"
             className="w-full bg-secondary font-normal mt-4 py-2.5"
           />

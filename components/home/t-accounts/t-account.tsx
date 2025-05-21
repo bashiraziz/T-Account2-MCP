@@ -1,63 +1,140 @@
 "use client";
 
-import { FC, useState } from "react";
-import { AutoCompleteDropdown, type Account } from "./autocomplete-dropdown";
+import { FC } from "react";
+import { AutoCompleteDropdown } from "./autocomplete-dropdown";
 import { TransactionSection, type Row } from "./transaction-section";
+import { ChartOfAccountsType, Entry } from "@/types";
+import { useAccountingStore } from "@/store";
+import { TAccountActions } from "./t-account-actions";
+import {
+  showErrorToast,
+  showSuccessToast,
+  ToastNotification,
+} from "@/components";
+import { useDeleteTAccount } from "@/hooks";
 
-// Example COA (we'll remove it later)
-const chartOfAccounts = [
-  { id: 1, number: "1001", name: "Cash" },
-  { id: 2, number: "2001", name: "Accounts Receivable" },
-  { id: 3, number: "3001", name: "Inventory" },
-  { id: 4, number: "4001", name: "Revenue" },
-  { id: 5, number: "5001", name: "Expenses" },
-];
+interface TAccountProps {
+  tAccountId: string;
+}
 
-export const TAccount: FC = () => {
-  const [debits, setDebits] = useState<Row[]>([
-    { id: 1, ref: "", desc: "", amount: "", type: "dr" },
-  ]);
-  const [credits, setCredits] = useState<Row[]>([
-    { id: 1, ref: "", desc: "", amount: "", type: "cr" },
-  ]);
-  const [selectedAccount, setSelectedAccount] = useState<Account | null>(null);
+export const TAccount: FC<TAccountProps> = ({ tAccountId }) => {
+  // selected t-account
+  const tAccount = useAccountingStore((state) =>
+    state.sessions
+      .flatMap((session) => session.tAccounts)
+      .find((tAcc) => tAcc.id === tAccountId)
+  );
+  // selected t-account's session
+  const session = useAccountingStore((state) =>
+    state.sessions.find((s) => s.id === tAccount?.sessionId)
+  );
 
-  const addRow = () => {
-    const newRowId = Date.now();
-    setDebits([
-      ...debits,
-      { id: newRowId, ref: "", desc: "", amount: "", type: "dr" },
-    ]);
-    setCredits([
-      ...credits,
-      { id: newRowId, ref: "", desc: "", amount: "", type: "cr" },
-    ]);
-  };
+  // session store hooks
+  const { updateTAccount, deleteTAccount, addEntry, updateEntry, deleteEntry } =
+    useAccountingStore();
 
-  // const removeRow = (id: number) => {
-  //   setDebits(debits.filter((row) => row.id !== id));
-  //   setCredits(credits.filter((row) => row.id !== id));
-  // };
+  // delete t-account api hook
+  const { mutate: handleDeleteTAccount, isPending: isDeleting } =
+    useDeleteTAccount();
 
-  const updateRow = (
-    type: "debit" | "credit",
-    id: number,
-    field: keyof Omit<Row, "id">,
-    value: string
-  ) => {
-    if (type === "debit") {
-      setDebits(
-        debits.map((row) => (row.id === id ? { ...row, [field]: value } : row))
-      );
-    } else {
-      setCredits(
-        credits.map((row) => (row.id === id ? { ...row, [field]: value } : row))
-      );
+  // handle select chart account
+  const handleSelectAccount = (account: ChartOfAccountsType | null) => {
+    if (!session || !account) return; // Ensure session exists and account is valid
+
+    // Check if the selected account is already used in another T-Account within the same session
+    const isAccountUsed = session.tAccounts.some(
+      (tAcc) =>
+        tAcc.chartOfAccount?.accountName === account.accountName &&
+        tAcc.id !== tAccountId
+    );
+
+    if (isAccountUsed) {
+      showErrorToast("This account is already used in another T-Account.");
+      return;
     }
+
+    updateTAccount(tAccount!.sessionId, tAccountId, {
+      chartOfAccount: account ?? undefined,
+    });
   };
 
-  const calculateTotal = (rows: Row[]) =>
-    rows.reduce((sum, row) => sum + (parseFloat(row.amount) || 0), 0);
+  // filter debits and credits
+  const debits = tAccount?.entries.filter((e) => e.entryType === "DEBIT") || [];
+  const credits =
+    tAccount?.entries.filter((e) => e.entryType === "CREDIT") || [];
+
+  // Add a pair of entries
+  const addRow = () => {
+    if (!tAccount) return;
+
+    const newDebitId = crypto.randomUUID();
+    const newCreditId = crypto.randomUUID();
+
+    addEntry(tAccount.sessionId, tAccount.id, {
+      id: newDebitId,
+      tAccountId: tAccount.id,
+      referenceNumber: "",
+      description: "",
+      amount: 0,
+      entryType: "DEBIT",
+    });
+
+    addEntry(tAccount.sessionId, tAccount.id, {
+      id: newCreditId,
+      tAccountId: tAccount.id,
+      referenceNumber: "",
+      description: "",
+      amount: 0,
+      entryType: "CREDIT",
+    });
+  };
+
+  // Update entry (ensures corresponding debit/credit updates)
+  const updateRow = (
+    type: "DEBIT" | "CREDIT",
+    id: string,
+    field: keyof Omit<Entry, "id" | "entryType" | "tAccountId">,
+    value: string | number
+  ) => {
+    if (!tAccount) return;
+
+    const updatedEntry = {
+      [field]: field === "amount" ? Number(value) || 0 : value,
+    };
+
+    updateEntry(tAccount.sessionId, tAccount.id, id, updatedEntry);
+  };
+
+  // Remove a pair of entries
+  const removeRow = (id: string) => {
+    if (!tAccount) return;
+
+    deleteEntry(tAccount.sessionId, tAccount.id, id);
+  };
+
+  // delete a t-account
+  const onDeleteTAccount = () => {
+    if (!tAccount?.sessionId || !tAccountId) return;
+
+    if (tAccount?.isNew) {
+      deleteTAccount(tAccount?.sessionId, tAccountId);
+      showSuccessToast("TAccount deleted");
+      return;
+    }
+
+    handleDeleteTAccount(tAccountId, {
+      onSuccess: () => {
+        deleteTAccount(tAccount?.sessionId, tAccountId);
+        showSuccessToast("TAccount deleted");
+      },
+      onError: () => {
+        showErrorToast("Failed to delete TAccount, try again.");
+      },
+    });
+  };
+  // calculate the total
+  const calculateTotal = (rows: Entry[]) =>
+    rows.reduce((sum, row) => sum + (row.amount || 0), 0);
 
   // total debit and credits
   const debitTotal = calculateTotal(debits);
@@ -73,19 +150,34 @@ export const TAccount: FC = () => {
   const TotalDebit = debitTotal + debitBalance;
   const TotalCredit = creditTotal + creditBalance;
 
+  // handle error of there is no t-account
+  if (!tAccount)
+    return (
+      <div>
+        <h2>No account found!</h2>
+      </div>
+    );
+
   return (
     <div className="w-full h-full flex flex-col">
-      <div className="mb-2">
+      <div className="flex gap-1 mb-2">
+        {/* dropdown to show the COA */}
         <AutoCompleteDropdown
-          accounts={chartOfAccounts}
-          selectedAccount={selectedAccount}
-          setSelectedAccount={setSelectedAccount}
+          tAccount={tAccount}
+          selectedAccount={tAccount.chartOfAccount}
+          setSelectedAccount={handleSelectAccount}
+        />
+        {/* Actions dropdown for delete and other actions */}
+        <TAccountActions
+          isLoading={isDeleting}
+          deleteTAccount={onDeleteTAccount}
         />
       </div>
 
       <div className="flex flex-1 border-t">
+        {/* Debit transactions */}
         <TransactionSection
-          type="debit"
+          type="DEBIT"
           rows={debits}
           addRow={addRow}
           // removeRow={removeRow}
@@ -93,8 +185,10 @@ export const TAccount: FC = () => {
           total={TotalDebit}
           balance={debitBalance}
         />
+
+        {/* Credit transactions */}
         <TransactionSection
-          type="credit"
+          type="CREDIT"
           rows={credits}
           addRow={addRow}
           // removeRow={removeRow}

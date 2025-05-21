@@ -1,9 +1,8 @@
-// # force the update of the vercel 
 import { ForgotPasswordForm } from "@/components";
 
 const ForgotPassword = () => {
   return (
-    <div>
+    <div className="w-full flex justify-center items-center">
       <ForgotPasswordForm />
     </div>
   );

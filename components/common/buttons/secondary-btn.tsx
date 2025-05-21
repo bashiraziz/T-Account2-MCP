@@ -6,6 +6,7 @@ interface SecondaryBtnProps {
   onClick?: () => void;
   isLoading?: boolean;
   icon?: JSX.Element;
+  disabled?: boolean;
 }
 
 export const SecondaryBtn: FC<SecondaryBtnProps> = ({
@@ -14,12 +15,13 @@ export const SecondaryBtn: FC<SecondaryBtnProps> = ({
   onClick,
   isLoading = false,
   icon,
+  disabled = false,
 }) => {
   return (
     <button
-      className={`flex items-center border text-base font-medium rounded px-4 py-2 transition-all duration-300 ease-in-out ${className}`}
+      className={`flex items-center border text-sm sm:text-base font-medium rounded px-4 py-2 transition-all duration-300 ease-in-out ${className}`}
       onClick={onClick}
-      disabled={isLoading}
+      disabled={isLoading || disabled}
     >
       {isLoading ? (
         "Loading..."

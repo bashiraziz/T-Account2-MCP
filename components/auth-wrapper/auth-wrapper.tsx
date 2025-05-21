@@ -15,7 +15,7 @@ export const AuthWrapper = ({ children }: { children: React.ReactNode }) => {
       {children}
     </div>
   ) : (
-    <div className="flex">
+    <div className="sm:flex">
       <Sidebar />
       <div className="flex-1 bg-background">
         <Navbar />

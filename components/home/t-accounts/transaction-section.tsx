@@ -1,4 +1,5 @@
 import { PrimaryInput } from "@/components";
+import { Entry, EntryType } from "@/types";
 import { FC } from "react";
 import { FiMinus, FiPlus } from "react-icons/fi";
 
@@ -11,15 +12,14 @@ export type Row = {
 };
 
 interface TransactionSectionProps {
-  type: "debit" | "credit";
-  rows: Row[];
+  type: EntryType;
+  rows: Entry[];
   addRow: () => void;
-  // removeRow: (id: number) => void;
   updateRow: (
-    type: "debit" | "credit",
-    id: number,
-    field: keyof Omit<Row, "id">,
-    value: string
+    type: EntryType,
+    id: string,
+    field: keyof Omit<Entry, "id" | "entryType" | "tAccountId">,
+    value: string | number
   ) => void;
   total: number;
   balance: number;
@@ -29,12 +29,12 @@ export const TransactionSection: FC<TransactionSectionProps> = ({
   type,
   rows,
   addRow,
-  // removeRow,
   updateRow,
+  // removeRow,
   total,
   balance,
 }) => {
-  const isDebit = type === "debit";
+  const isDebit = type === "DEBIT";
 
   const formatNumber = (num: number | string) => {
     if (!num) return "0.00";
@@ -51,10 +51,14 @@ export const TransactionSection: FC<TransactionSectionProps> = ({
     >
       {/* <h2 className="font-bold mb-4">{isDebit ? "Debit" : "Credit"}</h2> */}
       <div>
-        <div className="thin-scrollbar flex flex-col gap-2 min-h-[42px] max-h-[160px] overflow-auto p-2">
-          {rows.map((row) => (
-            <div key={row.id} className="flex items-center gap-2">
-              {/* <button
+        {rows.length > 0 && (
+          <div className="thin-scrollbar flex flex-col gap-2 min-h-[42px] max-h-[160px] overflow-auto p-2">
+            {rows.map((row) => (
+              <div
+                key={row.id}
+                className="flex max-sm:flex-wrap items-center gap-2"
+              >
+                {/* <button
                 className="w-4 h-4 flex justify-center items-center rounded disabled:opacity-50 disabled:cursor-not-allowed"
                 onClick={() => removeRow(row.id)}
                 disabled={rows.length === 1}
@@ -62,35 +66,49 @@ export const TransactionSection: FC<TransactionSectionProps> = ({
                 <FiMinus className="text-base" />
               </button> */}
 
-              <PrimaryInput
-                type="text"
-                value={row.ref}
-                placeholder="ref"
-                className="flex-1 !py-1.5 !px-2 text-sm !rounded"
-                onChange={(e) => updateRow(type, row.id, "ref", e.target.value)}
-              />
-              <PrimaryInput
-                type="text"
-                value={row.desc}
-                placeholder="desc"
-                className="flex-1 !py-1.5 !px-2 text-sm !rounded"
-                onChange={(e) =>
-                  updateRow(type, row.id, "desc", e.target.value)
-                }
-              />
-              <PrimaryInput
-                type="text"
-                value={row.amount}
-                placeholder={isDebit ? "dr" : "cr"}
-                className="w-20 !py-1.5 !px-2 text-sm !rounded"
-                inputClassName="text-right"
-                onChange={(e) =>
-                  updateRow(type, row.id, "amount", e.target.value)
-                }
-              />
-            </div>
-          ))}
-        </div>
+                <PrimaryInput
+                  type="text"
+                  value={row.referenceNumber}
+                  placeholder="ref"
+                  className="max-sm:w-[calc(50%-4px)] sm:flex-1 !py-1.5 !px-2 text-sm !rounded"
+                  onChange={(e) =>
+                    updateRow(type, row.id, "referenceNumber", e.target.value)
+                  }
+                />
+                <PrimaryInput
+                  type="text"
+                  value={row.description}
+                  placeholder="desc"
+                  className="max-sm:w-[calc(50%-4px)] sm:flex-1 !py-1.5 !px-2 text-sm !rounded"
+                  onChange={(e) =>
+                    updateRow(type, row.id, "description", e.target.value)
+                  }
+                />
+                <PrimaryInput
+                  type="text"
+                  value={
+                    row.amount == 0
+                      ? ""
+                      : Number(row.amount).toLocaleString("en-US")
+                  }
+                  placeholder={isDebit ? "dr" : "cr"}
+                  className="w-full sm:w-20 !py-1.5 !px-2 text-sm !rounded"
+                  inputClassName="text-right"
+                  onChange={(e) => {
+                    const rawValue = e.target.value.replace(/,/g, "");
+                    const numericValue = parseFloat(rawValue);
+                    updateRow(
+                      type,
+                      row.id,
+                      "amount",
+                      isNaN(numericValue) ? "" : numericValue
+                    );
+                  }}
+                />
+              </div>
+            ))}
+          </div>
+        )}
         <button
           className="w-6 h-6 flex justify-center items-center bg-primary text-white rounded mt-2 ml-2"
           onClick={addRow}

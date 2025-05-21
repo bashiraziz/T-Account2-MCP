@@ -2,7 +2,7 @@ import { LoginForm } from "@/components";
 
 const Login = () => {
   return (
-    <div>
+    <div className="w-full flex justify-center items-center">
       <LoginForm />
     </div>
   );

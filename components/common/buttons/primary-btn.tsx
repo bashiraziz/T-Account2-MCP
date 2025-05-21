@@ -7,6 +7,7 @@ interface PrimaryBtnProps {
   isLoading?: boolean;
   icon?: JSX.Element;
   type?: "submit" | "reset" | "button";
+  disabled?: boolean;
 }
 
 export const PrimaryBtn: React.FC<PrimaryBtnProps> = ({
@@ -16,18 +17,21 @@ export const PrimaryBtn: React.FC<PrimaryBtnProps> = ({
   isLoading = false,
   icon,
   type,
+  disabled = false,
 }) => {
   return (
     <button
-      className={`text-white text-base font-medium rounded px-4 py-2 ${className}`}
+      className={`text-white text-sm sm:text-base font-medium rounded px-4 py-2 ${className}`}
       onClick={onClick}
-      disabled={isLoading}
+      disabled={isLoading ? isLoading : disabled}
       type={type}
     >
       {isLoading ? (
         "Loading..."
       ) : (
-        <span className={`flex items-center gap-2 ${!icon ? "justify-center" : ""}`}>
+        <span
+          className={`flex items-center gap-2 ${!icon ? "justify-center" : ""}`}
+        >
           {icon} {text}
         </span>
       )}

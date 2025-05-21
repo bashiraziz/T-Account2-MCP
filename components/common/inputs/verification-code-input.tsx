@@ -39,7 +39,7 @@ export const VerificationCodeInput: FC<VerificationCodeInputProps> = ({
   };
 
   return (
-    <div className={`flex justify-center gap-2 ${loading ? "opacity-55" : ""}`}>
+    <div className={`flex justify-center gap-2 max-[360px]:gap-1 ${loading ? "opacity-55" : ""}`}>
       {code.map((digit, index) => (
         <input
           key={index}
@@ -49,7 +49,7 @@ export const VerificationCodeInput: FC<VerificationCodeInputProps> = ({
           maxLength={1}
           onChange={(e) => handleChange(index, e.target.value)}
           onKeyDown={(e) => handleKeyDown(index, e)}
-          className="w-12 h-12 text-center text-lg bg-[#f3f2f7] rounded-lg focus:outline-none focus:ring-2 focus:ring-secondary"
+          className="w-10 sm:w-12 h-10 sm:h-12 text-center text-lg bg-[#f3f2f7] rounded-lg focus:outline-none focus:ring-2 focus:ring-secondary"
           placeholder="0"
           disabled={loading}
         />
