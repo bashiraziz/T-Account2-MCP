@@ -2,6 +2,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import {
+  ErrorAlert,
   LoadingSpinner,
   PrimaryBtn,
   PrimaryInput,
@@ -41,6 +42,8 @@ export const SignUpForm = () => {
   const [usernameAvailable, setUsernameAvailable] = useState("");
 
   const [showVerifyEmail, setShowVerifyEmail] = useState(false);
+
+  const [isApiError, setIsApiError] = useState("");
   const router = useRouter();
 
   const { mutate: checkUsername, isPending: isCheckingUsername } =
@@ -134,8 +137,9 @@ export const SignUpForm = () => {
             },
           });
         },
-        onError: (error) => {
-          console.error("Verification Error:", error);
+        onError: (error: any) => {
+          const message = error?.response?.data?.error || "Verification failed";
+          setIsApiError(message);
         },
       }
     );
@@ -162,6 +166,7 @@ export const SignUpForm = () => {
           {(isVerifyingCode || isSigningUp) && (
             <LuLoaderCircle className="absolute bottom-2 left-0 right-0 z-10 mx-auto w-16 h-16 text-gray-500 animate-spin" />
           )}
+          {isApiError && <ErrorAlert error={isApiError} className="mb-2 w-fit mx-auto" />}
           <label className="flex justify-center text-base text-black mb-2">
             Enter your verification code
           </label>

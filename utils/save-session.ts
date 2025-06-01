@@ -6,7 +6,7 @@ type SaveSessionFn = (
   data: SaveSessionData,
   options?: {
     onSuccess?: () => void;
-    onError?: () => void;
+    onError?: (err: unknown) => void;
   }
 ) => void;
 
@@ -16,7 +16,7 @@ export const handleSaveSession = (
   updateSession: (sessionId: string, session: Session) => void,
   callbacks?: {
     onSuccess?: () => void;
-    onError?: () => void;
+    onError?: (err: unknown) => void;
   }
 ) => {
   if (!selectedSession.date) {
@@ -52,9 +52,11 @@ export const handleSaveSession = (
       showSuccessToast("Session saved successfully");
       callbacks?.onSuccess?.();
     },
-    onError: () => {
-      showErrorToast("Failed to save session, please try again.");
-      callbacks?.onError?.();
+    onError: (err: any) => {
+      const errorMessage =
+        err?.response?.data?.error || err.message || "Failed to save session";
+      showErrorToast(errorMessage);
+      callbacks?.onError?.(err);
     },
   });
 };

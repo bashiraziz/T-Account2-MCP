@@ -31,7 +31,11 @@ export const Profile: FC<ProfileProps> = ({ user, addNewSession }) => {
   const { startTour } = useTourStore();
 
   const handleLogout = () => {
-    if (selectedSession) {
+    if (
+      selectedSession &&
+      (selectedSession?.tAccounts.length === undefined ||
+        selectedSession?.tAccounts.length > 1)
+    ) {
       handleSaveSession(selectedSession, saveSession, updateSession, {
         onSuccess: () => {
           logout();

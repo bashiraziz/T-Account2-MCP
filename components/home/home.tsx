@@ -13,6 +13,7 @@ import AppTour from "@/components/app-tour/app-tour";
 
 export const Home: FC = () => {
   // this page will switch between the sessions, we have the latest Session displayed right now
+  const [hasStartedTour, setHasStartedTour] = useState(false);
   const { data: session, status } = useSession();
   const { data: userDetails, isLoading: loadingUser, isError } = useGetUser();
   const { setUser, user } = useUserStore();
@@ -126,22 +127,30 @@ export const Home: FC = () => {
 
   // Check if user has completed tour before
   useEffect(() => {
-    const tourCompleted = user?.hasSeenTour;
-    setTimeout(() => {
-      if (
-        !tourCompleted &&
-        status !== "loading" &&
-        !isLoading &&
-        !loadingSession &&
-        storeReady
-      ) {
-        const timer = setTimeout(() => {
-          startTour();
-        }, 1000);
-        return () => clearTimeout(timer);
-      }
-    }, 3000);
-  }, [startTour, status, isLoading, loadingSession, storeReady]);
+    if (!user || loadingUser || hasStartedTour) return;
+    console.log("User details:", userDetails);
+    console.log("User has seen tour:", userDetails?.hasSeenTour);
+
+    if (
+      !userDetails?.hasSeenTour &&
+      status !== "loading" &&
+      !isLoading &&
+      !loadingSession &&
+      storeReady
+    ) {
+      setHasStartedTour(true);
+      startTour();
+    }
+  }, [
+    user,
+    userDetails?.hasSeenTour,
+    loadingUser,
+    startTour,
+    status,
+    isLoading,
+    loadingSession,
+    storeReady,
+  ]);
 
   // loader while fetching data
   if (

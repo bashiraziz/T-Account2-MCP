@@ -20,6 +20,17 @@ export async function POST(req: Request) {
       );
     }
 
+    for (const tAccount of tAccounts) {
+      if (!tAccount.accountNumber || !tAccount.accountName) {
+        return NextResponse.json(
+          {
+            error: "Each T-Account must have an account selected",
+          },
+          { status: 400 }
+        );
+      }
+    }
+
     let savedSession;
 
     if (id) {

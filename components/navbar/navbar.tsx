@@ -87,7 +87,10 @@ export const Navbar: FC = () => {
           {user ? (
             <>
               {(pathname === "/" || pathname === "/trial-balance") && (
-                <div id="switch-session">
+                <div
+                  id="switch-session"
+                  className="max-sm:hidden max-w-[244px] xl:max-w-[300px] w-full"
+                >
                   <AutoCompleteInput
                     options={options}
                     selectedOption={selectedSessionId}
@@ -95,7 +98,7 @@ export const Navbar: FC = () => {
                       setSelectedSessionId(value.id.toString())
                     }
                     placeholder="Search session"
-                    className="max-sm:hidden max-w-[244px] xl:max-w-[300px] w-full"
+                    className="w-full"
                   />
                 </div>
               )}
