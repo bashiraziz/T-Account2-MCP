@@ -20,6 +20,7 @@ export const GET = async () => {
         lastName: true,
         phoneNumber: true,
         profileImage: true,
+        hasSeenTour: true,
       },
     });
 

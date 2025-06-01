@@ -9,11 +9,15 @@ import {
 import { FiChevronDown, FiX, FiCheck } from "react-icons/fi";
 import { useGetChartOfAccounts } from "@/hooks";
 import { useDebounce } from "use-debounce";
-import { LoadingSpinner } from "@/components";
+import { LoadingSpinner, SecondaryBtn } from "@/components";
 import { ChartOfAccountsType, TAccount } from "@/types";
 import { defaultCOA } from "@/lib";
 import { useSession } from "next-auth/react";
-import { useAccountingStore, useCOAStore } from "@/store";
+import {
+  useAccountingStore,
+  useAddAccountPopupStore,
+  useCOAStore,
+} from "@/store";
 import Link from "next/link";
 
 interface AutoCompleteDropdownProps {
@@ -32,6 +36,8 @@ export const AutoCompleteDropdown: FC<AutoCompleteDropdownProps> = ({
 
   const { updateTAccount } = useAccountingStore();
   const sessionId = tAccount?.sessionId;
+
+  const { openAddAccount } = useAddAccountPopupStore();
 
   const [query, setQuery] = useState("");
   const [debouncedQuery] = useDebounce(query, 500); // Debounced search input
@@ -88,7 +94,7 @@ export const AutoCompleteDropdown: FC<AutoCompleteDropdownProps> = ({
       onChange={setSelectedAccount}
       onClose={() => setQuery("")}
     >
-      <div className="w-full relative">
+      <div id="select-account" className="w-full relative">
         <ComboboxButton className="relative w-full text-start bg-[#f3f2f7] rounded-lg">
           <ComboboxInput
             className="w-full h-fit bg-transparent text-sm placeholder:text-sm px-4 py-2.5 rounded-lg focus:outline-1 focus:outline-secondary outline-none outline-offset-0"
@@ -123,7 +129,7 @@ export const AutoCompleteDropdown: FC<AutoCompleteDropdownProps> = ({
         <ComboboxOptions
           ref={listRef}
           onScroll={handleScroll}
-          className="thin-scrollbar absolute z-10 mt-1 max-h-60 w-full overflow-auto bg-white border rounded shadow-lg py-2"
+          className="thin-scrollbar absolute z-10 mt-1 max-h-[300px] w-full overflow-auto bg-white border rounded shadow-lg pt-2"
         >
           {isLoading ? (
             <div className="flex justify-cente r py-2 px-4 cursor-default select-none">
@@ -140,12 +146,6 @@ export const AutoCompleteDropdown: FC<AutoCompleteDropdownProps> = ({
                   "<span className="text-secondary">{query}</span>" was not
                   found
                 </p>
-                <Link
-                  href="/chart-of-accounts"
-                  className="text-sm text-secondary cursor-pointer underline"
-                >
-                  Add COA
-                </Link>
               </div>
             )
           ) : (
@@ -169,15 +169,7 @@ export const AutoCompleteDropdown: FC<AutoCompleteDropdownProps> = ({
                       <LoadingSpinner />
                     </span>
                   ) : !hasNextPage ? (
-                    <div className="flex items-center justify-between text-textDark px-4 py-2 bg-gray-200">
-                      <span>No more results</span>
-                      <Link
-                        href="/chart-of-accounts"
-                        className="text-sm text-secondary cursor-pointer underline"
-                      >
-                        Add COA
-                      </Link>
-                    </div>
+                    <p className="text-gray-400 px-4 py-2">No more results</p>
                   ) : (
                     ""
                   )}
@@ -185,9 +177,17 @@ export const AutoCompleteDropdown: FC<AutoCompleteDropdownProps> = ({
               )}
             </>
           )}
-          {!isLoading && accounts.length === 0 && (
+          {!isLoading && accounts.length === 0 && !query && (
             <div className="py-3 px-4">No accounts found!</div>
           )}
+          <div className="sticky bottom-0 left-0 bg-[#f3f2f7] px-4 py-3 flex items-center justify-between">
+            <span>Want to add a new account?</span>
+            <SecondaryBtn
+              onClick={openAddAccount}
+              text="Add Account"
+              className="border-secondary text-secondary !py-1.5 !text-sm"
+            />
+          </div>
         </ComboboxOptions>
       </div>
     </Combobox>

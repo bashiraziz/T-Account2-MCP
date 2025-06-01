@@ -3,7 +3,7 @@ export type ChartOfAccountsType = {
   userId?: string;
   accountCode: string;
   accountName: string;
-  classification: string;
-  type: string;
-  detailType?: string | null;
+  userDefined1?: string | null;
+  userDefined2?: string | null;
+  userDefined3?: string | null;
 };

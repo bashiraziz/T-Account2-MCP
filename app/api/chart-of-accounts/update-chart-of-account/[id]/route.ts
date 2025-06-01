@@ -11,9 +11,9 @@ export async function PUT(
       userId,
       accountCode,
       accountName,
-      classification,
-      type,
-      detailType,
+      userDefined1,
+      userDefined2,
+      userDefined3,
     } = await req.json();
 
     if (!id || !userId) {
@@ -57,7 +57,13 @@ export async function PUT(
 
     const updatedCOA = await prisma.chartOfAccount.update({
       where: { id },
-      data: { accountCode, accountName, classification, type, detailType },
+      data: {
+        accountCode,
+        accountName,
+        userDefined1,
+        userDefined2,
+        userDefined3,
+      },
     });
 
     return NextResponse.json(updatedCOA);

@@ -59,7 +59,9 @@ export const SelectAccount: FC<SelectAccountProps> = ({
   }, [data, userId, setAccounts]);
 
   const filteredAccounts = accounts.filter((account) =>
-    account.accountName.toLowerCase().includes(query.toLowerCase())
+    `${account.accountCode} ${account.accountName}`
+      .toLowerCase()
+      .includes(query.toLowerCase())
   );
   // Debounce fetchNextPage to prevent rapid API calls on fast scrolling
   const handleScroll = (event: React.UIEvent<HTMLDivElement>) => {
@@ -133,9 +135,6 @@ export const SelectAccount: FC<SelectAccountProps> = ({
                     "<span className="text-secondary">{query}</span>" was not
                     found
                   </p>
-                  {/* <span className="text-sm text-secondary cursor-pointer underline">
-                    Add COA
-                  </span> */}
                 </div>
               )
             ) : (
@@ -171,7 +170,7 @@ export const SelectAccount: FC<SelectAccountProps> = ({
                 )}
               </>
             )}
-            {!isLoading && accounts.length === 0 && (
+            {!isLoading && accounts.length === 0 && !query && (
               <div className="py-3 px-4">No accounts found!</div>
             )}
           </ComboboxOptions>

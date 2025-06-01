@@ -4,3 +4,4 @@ export * from "./sessions";
 export * from "./trial-balance";
 export * from "./feedback";
 export * from "./user";
+export * from "./screen-size";

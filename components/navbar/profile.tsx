@@ -4,13 +4,14 @@ import { Menu, MenuButton, MenuItem, MenuItems } from "@headlessui/react";
 import {
   FaFileInvoiceDollar,
   FaPlus,
+  FaQuestionCircle,
   FaSignOutAlt,
   FaUserAlt,
 } from "react-icons/fa";
 import { UserType } from "@/types";
 import { useLogout, useSaveSession } from "@/hooks";
 import { useRouter, usePathname } from "next/navigation";
-import { useAccountingStore } from "@/store";
+import { useAccountingStore, useTourStore } from "@/store";
 import { handleSaveSession } from "@/utils";
 import { TextLoader } from "../common";
 
@@ -27,6 +28,8 @@ export const Profile: FC<ProfileProps> = ({ user, addNewSession }) => {
   const { selectedSessionId, sessions, updateSession } = useAccountingStore();
   const selectedSession = sessions.find((s) => s.id === selectedSessionId);
 
+  const { startTour } = useTourStore();
+
   const handleLogout = () => {
     if (selectedSession) {
       handleSaveSession(selectedSession, saveSession, updateSession, {
@@ -42,9 +45,12 @@ export const Profile: FC<ProfileProps> = ({ user, addNewSession }) => {
   return (
     <>
       {isPending && <TextLoader text="Saving and logging out..." />}
-      <Menu as="div" className="relative inline-block text-left">
+      <Menu as="div" className="relative inline-block text-left" id="profile">
         <div>
-          <MenuButton className="rounded-full border-2 border-secondary cursor-pointer inline-flex w-12 h-12 justify-center bg-white">
+          <MenuButton
+            id="navigation-menu"
+            className="rounded-full border-2 border-secondary cursor-pointer inline-flex w-12 h-12 justify-center bg-white"
+          >
             <Image
               src={user?.profileImage ? user?.profileImage : "/images/user.png"}
               width={48}
@@ -96,6 +102,15 @@ export const Profile: FC<ProfileProps> = ({ user, addNewSession }) => {
             </MenuItem>
           </div>
           <div className="py-1">
+            <MenuItem>
+              <button
+                onClick={startTour}
+                className="flex items-center gap-2 w-full px-4 py-3 text-left text-sm text-gray-700 data-focus:bg-gray-100 data-focus:text-gray-900 data-focus:outline-hidden hover:text-secondary"
+              >
+                <FaQuestionCircle className="w-5 h-5" />
+                Guided Tour
+              </button>
+            </MenuItem>
             <MenuItem>
               <button
                 onClick={handleLogout}

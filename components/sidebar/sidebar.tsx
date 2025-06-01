@@ -17,6 +17,7 @@ import { useAccountingStore, useSidebarStore, useUserStore } from "@/store";
 import { handleSaveSession } from "@/utils";
 
 interface LinkItem {
+  id: string;
   href: string;
   icon: JSX.Element;
   label: string;
@@ -24,16 +25,19 @@ interface LinkItem {
 
 const links: LinkItem[] = [
   {
+    id: "t-accounts",
     href: "/",
     icon: <FaBook className="w-5 h-5" />,
     label: "T-Accounts",
   },
   {
+    id: "trial-balance",
     href: "/trial-balance",
     icon: <FaBalanceScale className="w-5 h-5" />,
     label: "Trial Balance",
   },
   {
+    id: "feedback",
     href: "/feedback",
     icon: <FaCommentDots className="w-5 h-5" />,
     label: "Feedback",
@@ -126,6 +130,7 @@ export const Sidebar: FC = () => {
               {links.map((link) => (
                 <Link
                   key={link.href}
+                  id={link.id}
                   href={link.href}
                   onClick={handleSidebarCollapse}
                   className={`h-10 text-base flex flex-nowrap whitespace-nowrap items-center gap-3 py-2 rounded-md ${

@@ -6,6 +6,7 @@ import { DeleteCoa } from "./delete-coa";
 import { UpdateCoa } from "./update-coa";
 import { DeleteAll } from "./delete-all";
 import { ToastNotification } from "../common";
+import { DownloadCoa } from "./download-coa";
 
 export const ChartOfAccountsForm = () => {
   return (
@@ -13,6 +14,8 @@ export const ChartOfAccountsForm = () => {
       <h2 className="text-[24px] mb-6">Manage your Chart of Accounts</h2>
       <ToastNotification />
       <div className="flex flex-col gap-6">
+        <DownloadCoa />
+        <hr className="border-gray-300" />
         <AddCoa />
         <hr className="border-gray-300" />
         <EditCoa />

@@ -7,17 +7,17 @@ const editChartOfAccount = async ({
   userId,
   accountCode,
   accountName,
-  classification,
-  type,
-  detailType,
+  userDefined1,
+  userDefined2,
+  userDefined3,
 }: {
   id: string;
   userId: string;
   accountCode: string;
   accountName: string;
-  classification: string;
-  type: string;
-  detailType?: string;
+  userDefined1: string;
+  userDefined2: string;
+  userDefined3?: string;
 }) => {
   const { data } = await axiosInstance.put(
     `${API_URLS.CHART_OF_ACCOUNTS.EDIT_CHART_OF_ACCOUNT}/${id}`,
@@ -25,9 +25,9 @@ const editChartOfAccount = async ({
       userId,
       accountCode,
       accountName,
-      classification,
-      type,
-      detailType,
+      userDefined1,
+      userDefined2,
+      userDefined3,
     }
   );
   return data;

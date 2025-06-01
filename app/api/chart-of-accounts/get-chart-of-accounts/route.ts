@@ -23,10 +23,13 @@ export async function GET(req: Request) {
           ? [
               { accountName: { contains: query, mode: "insensitive" } },
               { accountCode: { contains: query, mode: "insensitive" } },
-              { classification: { contains: query, mode: "insensitive" } },
             ]
           : undefined,
       },
+      orderBy: {
+        accountCode: "asc", // Sorts 1-9, A-Z
+      },
+
       skip: offset, // Pagination: Offset
       take: limit, // Pagination: Limit
     });

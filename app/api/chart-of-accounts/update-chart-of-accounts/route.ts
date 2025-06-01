@@ -2,7 +2,6 @@ import { NextResponse } from "next/server";
 import { prisma, normalizeKeys } from "@/lib";
 import { parse } from "csv-parse/sync";
 
-// Upload new COAs while preventing duplicates
 export async function POST(req: Request) {
   try {
     const formData = await req.formData();
@@ -47,7 +46,7 @@ export async function POST(req: Request) {
       );
     }
 
-    // Fetch existing account codes
+    // Fetch existing account codes for the user
     const existingCodes = new Set(
       (
         await prisma.chartOfAccount.findMany({
@@ -57,17 +56,34 @@ export async function POST(req: Request) {
       ).map((a) => a.accountCode)
     );
 
-    const newAccounts = accounts.filter(
-      (account) =>
-        account.accountCode && !existingCodes.has(account.accountCode)
-    );
+    // Map each account to expected fields, dynamically assign 3 userDefined fields
+    const mandatoryFields = ["accountCode", "accountName"];
+
+    const newAccounts = accounts
+      .filter(
+        (account) =>
+          account.accountCode &&
+          account.accountName &&
+          !existingCodes.has(account.accountCode)
+      )
+      .map((account) => {
+        const optionalKeys = Object.keys(account).filter(
+          (key) => !mandatoryFields.includes(key)
+        );
+
+        return {
+          userId,
+          accountCode: account.accountCode,
+          accountName: account.accountName,
+          userDefined1: optionalKeys[0] ? account[optionalKeys[0]] : null,
+          userDefined2: optionalKeys[1] ? account[optionalKeys[1]] : null,
+          userDefined3: optionalKeys[2] ? account[optionalKeys[2]] : null,
+        };
+      });
 
     if (newAccounts.length > 0) {
       await prisma.chartOfAccount.createMany({
-        data: newAccounts.map((account) => ({
-          ...account,
-          userId,
-        })),
+        data: newAccounts,
       });
     }
 

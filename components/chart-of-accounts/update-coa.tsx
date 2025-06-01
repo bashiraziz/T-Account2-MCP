@@ -16,6 +16,7 @@ export const UpdateCoa = () => {
       onSuccess: () => {
         showSuccessToast("Chart of Accounts Uploaded successfully!");
         onSuccess(); // Reset selected file after successful upload
+        window.location.reload(); // Reload to reflect changes
       },
       onError: (error: any) => {
         const errorMessage =
@@ -28,7 +29,9 @@ export const UpdateCoa = () => {
 
   return (
     <div>
-      <h4 className="text-primary text-lg font-medium mb-4">Add Chart of Accounts</h4>
+      <h4 className="text-primary text-lg font-medium mb-4">
+        Add Chart of Accounts
+      </h4>
       <UploadCoa onUpload={handleUpload} isLoading={uploadMutation.isPending} />
     </div>
   );

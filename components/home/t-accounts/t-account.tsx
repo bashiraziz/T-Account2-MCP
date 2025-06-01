@@ -174,7 +174,7 @@ export const TAccount: FC<TAccountProps> = ({ tAccountId }) => {
         />
       </div>
 
-      <div className="flex flex-1 border-t">
+      <div id="record-transactions" className="flex flex-1 border-t">
         {/* Debit transactions */}
         <TransactionSection
           type="DEBIT"

@@ -45,6 +45,7 @@ export async function POST(req: Request) {
         email,
         phoneNumber: phoneNumber || null,
         password: hashedPassword,
+        hasSeenTour: false,
       },
     });
 
@@ -62,9 +63,9 @@ export async function POST(req: Request) {
       userId,
       accountCode: coa.accountCode,
       accountName: coa.accountName,
-      classification: coa.classification,
-      type: coa.type,
-      detailType: coa.detailType || null,
+      userDefined1: coa.classification,
+      userDefined2: coa.type,
+      userDefined3: coa.detailType || null,
     }));
 
     // Insert into the database

@@ -50,7 +50,11 @@ export const Navbar: FC = () => {
     <div className="px-6 py-5 border-b bg-background">
       <div className="flex items-center justify-between gap-3">
         <div className="flex items-center gap-2 md:gap-4">
-          <span onClick={toggleCollapsed} className="hidden max-lg:flex">
+          <span
+            id="sidebar"
+            onClick={toggleCollapsed}
+            className="hidden max-lg:flex"
+          >
             <HiOutlineMenuAlt2 className="size-6 md:size-8" />
           </span>
           <div className="flex flex-col">
@@ -83,23 +87,27 @@ export const Navbar: FC = () => {
           {user ? (
             <>
               {(pathname === "/" || pathname === "/trial-balance") && (
-                <AutoCompleteInput
-                  options={options}
-                  selectedOption={selectedSessionId}
-                  onSelect={(value) =>
-                    setSelectedSessionId(value.id.toString())
-                  }
-                  placeholder="Search session"
-                  className="max-sm:hidden max-w-[244px] xl:max-w-[300px] w-full"
-                />
+                <div id="switch-session">
+                  <AutoCompleteInput
+                    options={options}
+                    selectedOption={selectedSessionId}
+                    onSelect={(value) =>
+                      setSelectedSessionId(value.id.toString())
+                    }
+                    placeholder="Search session"
+                    className="max-sm:hidden max-w-[244px] xl:max-w-[300px] w-full"
+                  />
+                </div>
               )}
 
               {pathname === "/" && (
-                <PrimaryBtn
-                  onClick={handleNewSession}
-                  text="New Session"
-                  className="bg-primary max-lg:hidden"
-                />
+                <div id="new-session">
+                  <PrimaryBtn
+                    onClick={handleNewSession}
+                    text="New Session"
+                    className="bg-primary max-lg:hidden"
+                  />
+                </div>
               )}
               <Profile user={user} addNewSession={handleNewSession} />
             </>
@@ -120,7 +128,7 @@ export const Navbar: FC = () => {
         </div>
       </div>
       {user && (pathname === "/" || pathname === "/trial-balance") && (
-        <div className="sm:hidden pt-5 flex justify-end">
+        <div id="switch-session2" className="sm:hidden mt-5 flex justify-end">
           <AutoCompleteInput
             options={options}
             selectedOption={selectedSessionId}

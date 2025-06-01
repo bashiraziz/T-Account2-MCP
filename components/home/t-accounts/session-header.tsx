@@ -118,19 +118,23 @@ export const SessionHeader: FC<SessionHeaderProps> = ({
 
       <div className="flex items-center gap-2 max-sm:w-full">
         {user && (
-          <SecondaryBtn
-            onClick={onSave}
-            text="Save changes"
-            disabled={disableSave}
-            className="!px-3 border-primary text-primary mr-2 disabled:cursor-not-allowed disabled:opacity-75"
-          />
+          <div id="save-changes">
+            <SecondaryBtn
+              onClick={onSave}
+              text="Save changes"
+              disabled={disableSave}
+              className="!px-3 border-primary text-primary mr-2 disabled:cursor-not-allowed disabled:opacity-75"
+            />
+          </div>
         )}
-        <PrimaryBtn
-          onClick={addTAccount}
-          text="T Account"
-          icon={<FiPlus className="w-5 h-5 -mr-1" />}
-          className="!px-3 bg-secondary"
-        />
+        <div id="add-t-account">
+          <PrimaryBtn
+            onClick={addTAccount}
+            text="T Account"
+            icon={<FiPlus className="w-5 h-5 -mr-1" />}
+            className="!px-3 bg-secondary"
+          />
+        </div>
         <SessionActions
           isLoading={isDeleting}
           deleteTAccount={onDeleteSession}

@@ -32,6 +32,7 @@ export const authOptions: NextAuthOptions = {
             username: true,
             profileImage: true,
             password: true, // Needed for validation, but will NOT be returned
+            hasSeenTour: true,
           },
         });
 
@@ -49,6 +50,7 @@ export const authOptions: NextAuthOptions = {
           lastName: user.lastName,
           username: user.username,
           profileImage: user.profileImage ?? undefined,
+          hasSeenTour: user.hasSeenTour,
         };
       },
     }),
@@ -63,6 +65,7 @@ export const authOptions: NextAuthOptions = {
         token.lastName = user.lastName;
         token.username = user.username;
         token.profileImage = user.profileImage;
+        token.hasSeenTour = user.hasSeenTour;
       }
       return token;
     },
@@ -74,6 +77,7 @@ export const authOptions: NextAuthOptions = {
         lastName: token.lastName as string,
         username: token.username as string,
         profileImage: token.profileImage as string,
+        hasSeenTour: token.hasSeenTour as boolean,
       };
       return session;
     },

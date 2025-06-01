@@ -6,4 +6,5 @@ export type UserType = {
   username: string;
   phoneNumber?: string;
   profileImage?: string;
+  hasSeenTour: boolean;
 };

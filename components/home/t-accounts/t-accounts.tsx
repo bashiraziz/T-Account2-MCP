@@ -1,12 +1,13 @@
 "use client";
-import { FC, useEffect, useRef } from "react";
+import { FC, useEffect, useRef, useState } from "react";
 import { TAccount } from "./t-account";
 import { SessionHeader } from "./session-header";
 import { type Session, type TAccount as TAccountType } from "@/types";
-import { useAccountingStore } from "@/store";
+import { useAccountingStore, useAddAccountPopupStore } from "@/store";
 import { nanoid } from "nanoid";
 import { useSaveSession, useSessionDetails } from "@/hooks";
 import {
+  AddAccountPopup,
   NoSessionIcon,
   PageLoader,
   ToastNotification,
@@ -148,6 +149,7 @@ export const TAccounts: FC<TAccountProps> = ({ selectedSession }) => {
           ))}
         </div>
       )}
+      <AddAccountPopup />
     </div>
   );
 };

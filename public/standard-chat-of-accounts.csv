@@ -1,0 +1,88 @@
+Account Code,Account Name,Classification,Type,Detail Type
+10000,Cash,Asset,Cash,Cash
+10001,Cash on Hand,Asset,Cash,Cash on Hand
+10002,Main Checking Account,Asset,Cash,Bank Account - Operating 
+10003,Savings Account,Asset,Cash,Bank Account - Savings
+10100,Accounts Receivable - General,Asset,Accounts Receivable,Accounts Receivable
+10101,Accounts Receivable - Billed,Asset,Accounts Receivable,Accounts Receivable
+10102,Accounts Receivable - Billed,Asset,Accounts Receivable,Accounts Receivable
+10200,Prepaid Expense,Asset,Other Current Asset,Prepaid Expense
+10201,Prepaid Rent,Asset,Other Current Asset,Prepaid Expense
+10300,Inventory on Hand,Asset,Other Current Asset,Inventory
+10400,Other Current Assets,Asset,Other Current Asset,Other Current Assets
+10401,Advance Payments,Asset,Other Current Asset,Advance Payments
+10402,Employee Loans,Asset,Other Current Asset,Employee Advances
+10403,Miscellaneous Receivables,Asset,Other Current Asset,Other Receivables
+10404,Security Deposits,Asset,Other Current Asset,Security Deposits
+10500,Fixed Assets,Asset,Fixed Asset,Fixed Assets
+10501,Vehicle,Asset,Fixed Assets,
+10502,Office Equipment,Asset,Fixed Asset,Office Equipment
+10503,IT Equipment,Asset,Fixed Asset,IT Equipment
+10599,Accumulated Depreciation - Assets,Asset,Fixed Asset,Accumulated Depreciation
+20100,Accounts Payable - Trade,Liabilities,Accounts Payable,Accounts Payable
+20200,Deferred Revenue,Liabilities,Other Current Liabilities,Deferred Revenue
+20300,Payroll Taxes Payable,Liabilities,Other Current Liabilities,Payroll Liabilities
+20301,Federal Withholding Payable,Liabilities,Other Current Liabilities,Payroll Liabilities
+20302,State Withholding Payable,Liabilities,Other Current Liabilities,Payroll Liabilities
+20303,City Taxes Payable,Liabilities,Other Current Liabilities,Payroll Liabilities
+20304,Employee Deductions Payable,Liabilities,Other Current Liabilities,Payroll Liabilities
+20305,PTO Accrual,Liabilities,Other Current Liabilities,Payroll Liabilities
+20306,Retirement Contributions Payable,Liabilities,Other Current Liabilities,Payroll Liabilities
+20400,Bank Loans Payable,Liabilities,Long-Term Liabilities,Bank Loans
+20500,Intercompany Payable,Liabilities,Other Current Liabilities,Intercompany Payable
+30000,Opening Equity Balance,Equity,Equity,Opening Balance Equity
+30100,Owner's Capital Account,Equity,Equity,Owner's Equity
+30200,Common Stock,Equity,Equity,Common Stock
+30300,Retained Income,Equity,Equity,Retained Earnings
+40100,Revenue from Services,Revenue,Income,Service Revenue
+40200,Revenue from Products,Revenue,Income,Product Revenue
+40300,Deferred Revenue,Revenue,Income,Deferred Revenue
+50000,Cost of Goods Sold,COGS,Cost of Goods Sold,COGS
+50100,Labor Costs - Direct,COGS,Cost of Goods Sold,Direct Labor
+50200,Subcontractor Costs,COGS,Cost of Goods Sold,Subcontractors
+50300,Manufacturing Supplies,COGS,Cost of Goods Sold,Supplies
+50400,Packaging Materials,COGS,Cost of Goods Sold,Materials
+50500,Travel Expenses - Direct,COGS,Cost of Goods Sold,Travel Expenses
+50501,Lodging Expenses,COGS,Cost of Goods Sold,Lodging
+50502,Transportation,COGS,Cost of Goods Sold,Transportation
+50503,Fuel Reimbursements,COGS,Cost of Goods Sold,Fuel Reimbursements
+50504,Business Meals - Direct,COGS,Cost of Goods Sold,Meals
+50505,Airfare Expenses,COGS,Cost of Goods Sold,Airfare
+50506,Car Rentals,COGS,Cost of Goods Sold,Car Rentals
+50600,Miscellaneous Direct Costs,COGS,Cost of Goods Sold,Miscellaneous Costs
+60000,Employee Benefits,Expense,Expense,Employee Benefits
+60100,Health Insurance Premiums,Expense,Expense,Health Insurance
+60101,Dental Insurance Premiums,Expense,Expense,Dental Insurance
+60200,Retirement Plan Contributions,Expense,Expense,Retirement Contributions
+60300,Workers' Comp Insurance,Expense,Expense,Workers' Compensation
+60400,Employer Payroll Taxes,Expense,Expense,Payroll Taxes
+70000,Overhead,Expense,Expense,Overhead
+70100,Office Rent,Expense,Expense,Office Rent
+70101,Utility Bills,Expense,Expense,Utilities
+70102,Building Maintenance,Expense,Expense,Maintenance
+70200,Printing and Stationery,Expense,Expense,Printing and Stationery
+70201,Office Supplies,Expense,Expense,Office Supplies
+70202,Telephone and Internet,Expense,Expense,Communications
+70300,Technology Subscriptions,Expense,Expense,Technology Subscriptions
+70400,Depreciation Expenses,Expense,Expense,Depreciation
+80000,General Administrative Expenses,Expense,Expense,Administrative Expenses
+80100,Administrative Wages,Expense,Expense,Wages
+80200,Staff Training and Development,Expense,Expense,Training
+80300,Recruitment Costs,Expense,Expense,Recruitment
+80400,Professional Services,Expense,Expense,Professional Fees
+88000,Marketing and Advertising,Expense,Expense,Marketing
+88100,Online Advertising,Expense,Expense,Advertising
+88200,Event Sponsorship,Expense,Expense,Event Sponsorship
+88300,Print Marketing,Expense,Expense,Marketing
+88400,Social Media Marketing,Expense,Expense,Social Media
+88500,Website Hosting,Expense,Expense,Hosting
+90000,Miscellaneous Expenses,Expense,Expense,Miscellaneous
+90100,Unallowable Business Costs,Expense,Expense,Unallowable Costs
+90200,Legal Penalties,Expense,Expense,Penalties
+90300,Bank Fees,Expense,Expense,Bank Fees
+90400,Interest Charges,Expense,Expense,Interest
+90500,Donations and Contributions,Expense,Expense,Donations
+98000,Other Income,Other,Other Income,Miscellaneous Income
+98100,Dividend Income,Other,Other Income,Dividends
+98200,Investment Gains,Other,Other Income,Investments
+98300,Other Expenses,Other,Other Expenses,Other Expenses

@@ -9,6 +9,7 @@ declare module "next-auth" {
       lastName: string;
       username: string;
       profileImage?: string;
+      hasSeenTour: boolean;
     };
   }
 
@@ -19,6 +20,7 @@ declare module "next-auth" {
     lastName: string;
     username: string;
     profileImage?: string;
+    hasSeenTour: boolean;
   }
 
   interface JWT {
@@ -28,5 +30,6 @@ declare module "next-auth" {
     lastName: string;
     username: string;
     profileImage?: string;
+    hasSeenTour: boolean;
   }
 }

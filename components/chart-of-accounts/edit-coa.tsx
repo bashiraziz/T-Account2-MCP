@@ -34,9 +34,6 @@ export const EditCoa = () => {
       newErrors.accountName = "Account name is required";
     if (!formData?.accountCode)
       newErrors.accountCode = "Account code is required";
-    if (!formData?.classification)
-      newErrors.classification = "Classification is required";
-    if (!formData?.type) newErrors.type = "Type is required";
     return newErrors;
   };
 
@@ -59,7 +56,9 @@ export const EditCoa = () => {
       userId: user?.id ?? "",
       ...formData,
       id: formData?.id ?? "",
-      detailType: formData.detailType || undefined,
+      userDefined1: formData?.userDefined1 ?? "",
+      userDefined2: formData?.userDefined2 ?? "",
+      userDefined3: formData?.userDefined3 ?? "",
     };
 
     editCoa(payload, {
@@ -91,23 +90,11 @@ export const EditCoa = () => {
         {selectedAccount && formData && (
           <>
             <OutlinedInput
-              containerClassName="w-full"
-              className={`!py-3 ${
-                errors.accountName ? "outline outline-1 outline-red-500" : ""
-              }`}
-              label="Account Name"
-              placeholder="e.g. Savings Account"
-              error={errors.accountName}
-              name="accountName"
-              value={formData.accountName}
-              onChange={handleChange}
-            />
-            <OutlinedInput
               containerClassName="w-full sm:w-[calc(50%-6px)]"
               className={`!py-3 ${
                 errors.accountCode ? "outline outline-1 outline-red-500" : ""
               }`}
-              label="Account Code"
+              label="Account Code*"
               placeholder="e.g. 10003"
               error={errors.accountCode}
               name="accountCode"
@@ -117,34 +104,40 @@ export const EditCoa = () => {
             <OutlinedInput
               containerClassName="w-full sm:w-[calc(50%-6px)]"
               className={`!py-3 ${
-                errors.classification ? "outline outline-1 outline-red-500" : ""
+                errors.accountName ? "outline outline-1 outline-red-500" : ""
               }`}
-              label="Classification"
-              placeholder="e.g. Asset"
-              error={errors.classification}
-              name="classification"
-              value={formData.classification}
-              onChange={handleChange}
-            />
-            <OutlinedInput
-              containerClassName="w-full sm:w-[calc(50%-6px)]"
-              className={`!py-3 ${
-                errors.type ? "outline outline-1 outline-red-500" : ""
-              }`}
-              label="Type"
-              placeholder="e.g. Cash"
-              error={errors.type}
-              name="type"
-              value={formData.type}
+              label="Account Name*"
+              placeholder="e.g. Savings Account"
+              error={errors.accountName}
+              name="accountName"
+              value={formData.accountName}
               onChange={handleChange}
             />
             <OutlinedInput
               containerClassName="w-full sm:w-[calc(50%-6px)]"
               className={`!py-3`}
-              label="Detail Type"
+              label="User Defined 1"
+              placeholder="e.g. Asset"
+              name="userDefined1"
+              value={formData.userDefined1 || ""}
+              onChange={handleChange}
+            />
+            <OutlinedInput
+              containerClassName="w-full sm:w-[calc(50%-6px)]"
+              className={`!py-3`}
+              label="User Defined 2"
+              placeholder="e.g. Cash"
+              name="userDefined2"
+              value={formData.userDefined2 || ""}
+              onChange={handleChange}
+            />
+            <OutlinedInput
+              containerClassName="w-full"
+              className={`!py-3`}
+              label="User Defined 3"
               placeholder="e.g. Bank Account - Savings"
-              name="detailType"
-              value={formData.detailType || ""}
+              name="userDefined3"
+              value={formData.userDefined3 || ""}
               onChange={handleChange}
             />
             <PrimaryBtn

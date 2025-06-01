@@ -20,6 +20,7 @@ export const API_URLS = {
     UPDATE_USER: "/api/user/update-user",
     CHANGE_PASSWORD: "/api/user/change-password",
     DELETE_ACCOUNT: "/api/user/delete-account",
+    HAS_SEEN_TOUR: "/api/user/has-seen-tour",
   },
   CHART_OF_ACCOUNTS: {
     GET_CHART_OF_ACCOUNTS: "/api/chart-of-accounts/get-chart-of-accounts",

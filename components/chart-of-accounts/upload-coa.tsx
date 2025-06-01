@@ -16,12 +16,7 @@ export const UploadCoa = ({
   const [isValidating, setIsValidating] = useState(false);
 
   // Required fields to check in each record
-  const requiredFields = [
-    "Account Code",
-    "Account Name",
-    "Classification",
-    "Type",
-  ];
+  const requiredFields = ["Account Code", "Account Name"];
   // Detail Type is optional
 
   const validateFileContent = (file: File) => {
@@ -181,8 +176,10 @@ export const UploadCoa = ({
       {files.length === 0 && (
         <div className="bg-secondaryLight border border-secondary max-w-[680px] w-full p-3 text-center rounded-md mb-4">
           <p className="text-sm font-normal">
-            Each entry must contain the following required fields: Account Code,
-            Account Name, Classification, and Type
+            Each entry must contain the following required fields:{" "}
+            <b className="font-medium">Account Code</b> and{" "}
+            <b className="font-medium">Account Name</b>. Additionally, up to
+            three optional fields can be provided.
           </p>
         </div>
       )}

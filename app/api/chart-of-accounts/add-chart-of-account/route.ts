@@ -7,12 +7,12 @@ export async function POST(req: Request) {
       userId,
       accountCode,
       accountName,
-      classification,
-      type,
-      detailType,
+      userDefined1,
+      userDefined2,
+      userDefined3,
     } = await req.json();
 
-    if (!userId || !accountCode || !accountName || !classification || !type) {
+    if (!userId || !accountCode || !accountName) {
       return NextResponse.json(
         { error: "Missing required fields" },
         { status: 400 }
@@ -48,9 +48,9 @@ export async function POST(req: Request) {
         userId,
         accountCode,
         accountName,
-        classification,
-        type,
-        detailType,
+        userDefined1,
+        userDefined2,
+        userDefined3,
       },
     });
 
