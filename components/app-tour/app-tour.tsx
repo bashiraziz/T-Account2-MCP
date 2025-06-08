@@ -1,8 +1,6 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { FaTimes } from "react-icons/fa";
-import { LuX } from "react-icons/lu";
 import Joyride, {
   Step,
   CallBackProps,
@@ -24,17 +22,25 @@ interface AppTourProps {
   styles?: any;
 }
 
-// Custom tooltip component for better styling
-const CustomTooltip: React.FC<TooltipRenderProps> = ({
+// Extend TooltipRenderProps to add your own props
+interface CustomTooltipProps extends TooltipRenderProps {
+  onTourEnd?: () => void;
+  setTourState: React.Dispatch<
+    React.SetStateAction<{ run: boolean; stepIndex: number }>
+  >;
+}
+
+// Custom tooltip component for better styling and skip handling
+const CustomTooltip: React.FC<CustomTooltipProps> = ({
   continuous,
   index,
   step,
   backProps,
-  closeProps,
   primaryProps,
-  skipProps,
   tooltipProps,
   size,
+  onTourEnd,
+  setTourState,
 }) => (
   <div
     {...tooltipProps}
@@ -58,7 +64,12 @@ const CustomTooltip: React.FC<TooltipRenderProps> = ({
           </button>
         )}
         <button
-          {...skipProps}
+          onClick={() => {
+            setTourState({ run: false, stepIndex: 0 });
+            if (onTourEnd) {
+              onTourEnd();
+            }
+          }}
           className="text-sm text-gray-500 hover:text-gray-700 transition-colors"
         >
           Skip Tour
@@ -79,13 +90,6 @@ const CustomTooltip: React.FC<TooltipRenderProps> = ({
         )}
       </div>
     </div>
-
-    {/* <button
-      {...closeProps}
-      className="absolute top-3 right-3 text-gray-400 hover:text-gray-600 transition-colors"
-    >
-      <LuX className="size-5" />
-    </button> */}
   </div>
 );
 
@@ -160,10 +164,15 @@ const AppTour: React.FC<AppTourProps> = ({
       showSkipButton={showSkipButton}
       styles={{
         ...defaultStyles,
-
         ...styles,
       }}
-      tooltipComponent={CustomTooltip}
+      tooltipComponent={(tooltipProps) => (
+        <CustomTooltip
+          {...tooltipProps}
+          onTourEnd={onTourEnd}
+          setTourState={setTourState}
+        />
+      )}
       disableOverlayClose
       disableScrollParentFix
       hideCloseButton

@@ -111,12 +111,15 @@ export const Home: FC = () => {
   const { isRunning, startTour, stopTour } = useTourStore();
 
   const handleTourEnd = () => {
+    console.log("Tour ended!");
     markTourAsSeen(user?.id ?? "", {
       onSuccess: () => {
+        console.log("Tour ended11");
         setUser({
           ...user!,
           hasSeenTour: true,
         });
+        stopTour();
       },
     });
   };
@@ -127,29 +130,43 @@ export const Home: FC = () => {
 
   // Check if user has completed tour before
   useEffect(() => {
-    if (!user || loadingUser || hasStartedTour) return;
-    console.log("User details:", userDetails);
-    console.log("User has seen tour:", userDetails?.hasSeenTour);
+    const timeoutId = setTimeout(() => {
+      if (
+        !user ||
+        loadingUser ||
+        hasStartedTour ||
+        status === "loading" ||
+        isLoading ||
+        loadingSession ||
+        !storeReady
+      ) {
+        return;
+      }
 
-    if (
-      !userDetails?.hasSeenTour &&
-      status !== "loading" &&
-      !isLoading &&
-      !loadingSession &&
-      storeReady
-    ) {
+      if (userDetails?.hasSeenTour) {
+        if (isRunning) {
+          stopTour();
+        }
+        return;
+      }
+
+      console.log("Checking if user has seen tour", isRunning);
+
       setHasStartedTour(true);
       startTour();
-    }
+    }, 1000);
+
+    return () => clearTimeout(timeoutId);
   }, [
     user,
-    userDetails?.hasSeenTour,
+    userDetails,
     loadingUser,
-    startTour,
+    hasStartedTour,
     status,
     isLoading,
     loadingSession,
     storeReady,
+    startTour,
   ]);
 
   // loader while fetching data
