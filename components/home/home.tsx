@@ -111,10 +111,8 @@ export const Home: FC = () => {
   const { isRunning, startTour, stopTour } = useTourStore();
 
   const handleTourEnd = () => {
-    console.log("Tour ended!");
     markTourAsSeen(user?.id ?? "", {
       onSuccess: () => {
-        console.log("Tour ended11");
         setUser({
           ...user!,
           hasSeenTour: true,
@@ -149,8 +147,6 @@ export const Home: FC = () => {
         }
         return;
       }
-
-      console.log("Checking if user has seen tour", isRunning);
 
       setHasStartedTour(true);
       startTour();
